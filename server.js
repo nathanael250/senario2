@@ -46,7 +46,7 @@ app.post('/ussd', async (req, res) => {
                     if (textArray[1] === '0') {
                         response = `CON Welcome to BMI Checker / Murakaza neza kuri BMI Checker\n1. English\n2. Kinyarwanda`;
                     } else {
-                        session.age = parseFloat(textArray[1]);
+                        session.age = parseInt(textArray[1]);
                         response = `CON Please enter your weight in KG:\n0. Back`;
                     }
                     break;
@@ -63,7 +63,7 @@ app.post('/ussd', async (req, res) => {
                     if (textArray[3] === '0') {
                         response = `CON Please enter your weight in KG:\n0. Back`;
                     } else {
-                        const ageEng = parseFloat(textArray[1]);
+                        const ageEng = session.age;
                         const weightEng = parseFloat(textArray[2]);
                         const heightCmEng = parseFloat(textArray[3]);
                         const heightMEng = heightCmEng / 100;
@@ -80,7 +80,7 @@ app.post('/ussd', async (req, res) => {
 
                 case 5:
                     if (textArray[4] === '0') {
-                        const ageEng = parseFloat(textArray[1]);
+                        const ageEng = session.age;
                         const weightEng = parseFloat(textArray[2]);
                         const heightCmEng = parseFloat(textArray[3]);
                         const heightMEng = heightCmEng / 100;
@@ -93,7 +93,7 @@ app.post('/ussd', async (req, res) => {
                         response = `CON Your BMI is ${bmiEng.toFixed(1)} (${categoryEng})\nDo you want health tips?\n1. Yes\n2. No\n0. Back`;
                     } else {
                         const tipChoiceEng = textArray[4];
-                        const ageEng = parseFloat(textArray[1]);
+                        const ageEng = session.age;
                         const weightEng = parseFloat(textArray[2]);
                         const heightCmEng = parseFloat(textArray[3]);
                         const heightMEng = heightCmEng / 100;
@@ -127,7 +127,6 @@ app.post('/ussd', async (req, res) => {
                         });
                         await bmiRecord.save();
 
-
                         session.status = 'completed';
 
                         response = tipChoiceEng === '1'
@@ -151,7 +150,8 @@ app.post('/ussd', async (req, res) => {
                     if (textArray[1] === '0') {
                         response = `CON Welcome to BMI Checker / Murakaza neza kuri BMI Checker\n1. English\n2. Kinyarwanda`;
                     } else {
-                        session.age = parseFloat(textArray[1]);
+                       
+                        session.age = parseInt(textArray[1]);
                         response = `CON Andika ibiro byawe mu kirogaramu (KG):\n0. Back`;
                     }
                     break;
@@ -168,7 +168,7 @@ app.post('/ussd', async (req, res) => {
                     if (textArray[3] === '0') {
                         response = `CON Andika ibiro byawe mu kirogaramu (KG):\n0. Back`;
                     } else {
-                        const ageKin = parseFloat(textArray[1]);
+                        const ageKin = session.age;
                         const weightKin = parseFloat(textArray[2]);
                         const heightCmKin = parseFloat(textArray[3]);
                         const heightMKin = heightCmKin / 100;
@@ -185,7 +185,7 @@ app.post('/ussd', async (req, res) => {
 
                 case 5:
                     if (textArray[4] === '0') {
-                        const ageKin = parseFloat(textArray[1]);
+                        const ageKin = session.age;
                         const weightKin = parseFloat(textArray[2]);
                         const heightCmKin = parseFloat(textArray[3]);
                         const heightMKin = heightCmKin / 100;
@@ -198,7 +198,7 @@ app.post('/ussd', async (req, res) => {
                         response = `CON BMI yawe ni ${bmiKin.toFixed(1)} (${categoryKin})\nUkeneye inama z'ubuzima?\n1. Yego\n2. Oya\n0. Back`;
                     } else {
                         const tipChoiceKin = textArray[4];
-                        const ageKin = parseFloat(textArray[1]);
+                        const ageKin = session.age;
                         const weightKin = parseFloat(textArray[2]);
                         const heightCmKin = parseFloat(textArray[3]);
                         const heightMKin = heightCmKin / 100;
@@ -221,7 +221,7 @@ app.post('/ussd', async (req, res) => {
                         }
 
                         const bmiRecord = new BmiRecord({
-                            session_id: sessionId,
+                            session_id: session._id,
                             phone_number: phoneNumber,
                             age: ageKin,
                             weight: weightKin,
@@ -231,6 +231,8 @@ app.post('/ussd', async (req, res) => {
                             requested_tips: tipChoiceKin === '1'
                         });
                         await bmiRecord.save();
+
+
                         session.status = 'completed';
 
                         response = tipChoiceKin === '1'
