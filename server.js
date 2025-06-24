@@ -4,7 +4,6 @@ const connectDb = require('./config/database');
 const UssdSession = require('./models/ussd_sessions');
 const BmiRecord = require('./models/bmi_records');
 
-// Connect to MongoDB
 connectDb();
 
 const app = express();
@@ -17,7 +16,6 @@ app.post('/ussd', async (req, res) => {
     let { sessionId, serviceCode, phoneNumber, text } = req.body;
 
     try {
-        // Find or create session
         let session = await UssdSession.findOne({ session_id: sessionId });
         if (!session) {
             session = new UssdSession({
@@ -33,7 +31,6 @@ app.post('/ussd', async (req, res) => {
         const textArray = text.split('*');
         const level = textArray.length;
 
-        // Update session step
         session.current_step = level;
 
         if (text === '') {
@@ -49,7 +46,6 @@ app.post('/ussd', async (req, res) => {
                     if (textArray[1] === '0') {
                         response = `CON Welcome to BMI Checker / Murakaza neza kuri BMI Checker\n1. English\n2. Kinyarwanda`;
                     } else {
-                        // Save age
                         session.age = parseFloat(textArray[1]);
                         response = `CON Please enter your weight in KG:\n0. Back`;
                     }
@@ -119,9 +115,8 @@ app.post('/ussd', async (req, res) => {
                             tipEng = "See a doctor and follow a weight-loss plan.";
                         }
 
-                        // Save BMI record
                         const bmiRecord = new BmiRecord({
-                            session_id: sessionId,
+                            session_id: session._id,
                             phone_number: phoneNumber,
                             age: ageEng,
                             weight: weightEng,
@@ -132,7 +127,7 @@ app.post('/ussd', async (req, res) => {
                         });
                         await bmiRecord.save();
 
-                        // Update session status
+
                         session.status = 'completed';
 
                         response = tipChoiceEng === '1'
@@ -156,7 +151,6 @@ app.post('/ussd', async (req, res) => {
                     if (textArray[1] === '0') {
                         response = `CON Welcome to BMI Checker / Murakaza neza kuri BMI Checker\n1. English\n2. Kinyarwanda`;
                     } else {
-                        // Save age
                         session.age = parseFloat(textArray[1]);
                         response = `CON Andika ibiro byawe mu kirogaramu (KG):\n0. Back`;
                     }
@@ -226,7 +220,6 @@ app.post('/ussd', async (req, res) => {
                             tipKin = "Sura muganga kandi ugabanye ibiro ukoresheje regime.";
                         }
 
-                        // Save BMI record
                         const bmiRecord = new BmiRecord({
                             session_id: sessionId,
                             phone_number: phoneNumber,
@@ -238,8 +231,6 @@ app.post('/ussd', async (req, res) => {
                             requested_tips: tipChoiceKin === '1'
                         });
                         await bmiRecord.save();
-
-                        // Update session status
                         session.status = 'completed';
 
                         response = tipChoiceKin === '1'
@@ -257,7 +248,6 @@ app.post('/ussd', async (req, res) => {
             response = `END Invalid input. Please try again.`;
         }
 
-        // Save session
         await session.save();
 
         res.set('Content-Type: text/plain');

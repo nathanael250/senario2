@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const bmiRecordSchema = new mongoose.Schema({
     session_id: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'UssdSession',
         required: true,
         index: true
     },
@@ -10,6 +11,10 @@ const bmiRecordSchema = new mongoose.Schema({
         type: String,
         required: true,
         index: true
+    },
+    age: {
+        type: Number,
+        required: true
     },
     weight: {
         type: Number,
@@ -35,5 +40,9 @@ const bmiRecordSchema = new mongoose.Schema({
 }, {
     timestamps: { createdAt: 'created_at', updatedAt: false }
 });
+
+bmiRecordSchema.methods.getSessionData = function() {
+    return this.populate('session_id');
+};
 
 module.exports = mongoose.model('BmiRecord', bmiRecordSchema);

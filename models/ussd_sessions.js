@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 const ussdSessionSchema = new mongoose.Schema({
@@ -20,6 +19,10 @@ const ussdSessionSchema = new mongoose.Schema({
     current_step: {
         type: Number,
         default: 0
+    },
+    age: {
+        type: Number,
+        default: null
     },
     status: {
         type: String,
